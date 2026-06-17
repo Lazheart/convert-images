@@ -79,7 +79,7 @@ export const HomeSelector: React.FC = () => {
 
                 {card.featured && (
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
-                    Popular
+                    Nuevo
                   </span>
                 )}
               </div>
