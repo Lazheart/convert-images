@@ -17,6 +17,7 @@ interface ProcessingOptions {
   height?: number;
   maintainAspectRatio?: boolean;
   scalePercentage?: number;
+  applyDimensions?: boolean;
   cropArea?: CropArea;
   rotation?: 0 | 90 | 180 | 270;
   flipHorizontal?: boolean;
@@ -80,15 +81,19 @@ self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
     }
 
     // --- PIPELINE STEP 2: RESIZE ---
-    if (options.action === 'resize') {
+    const shouldResize =
+      options.action === 'resize' ||
+      (options.action === 'convert' && options.applyDimensions);
+
+    if (shouldResize) {
       let targetWidth = currentWidth;
       let targetHeight = currentHeight;
 
-      if (options.resizeType === 'percentage' && options.scalePercentage) {
+      if (options.action === 'resize' && options.resizeType === 'percentage' && options.scalePercentage) {
         const scale = options.scalePercentage / 100;
         targetWidth = Math.max(1, Math.round(currentWidth * scale));
         targetHeight = Math.max(1, Math.round(currentHeight * scale));
-      } else if (options.resizeType === 'pixels') {
+      } else {
         const reqW = options.width;
         const reqH = options.height;
 
@@ -176,12 +181,10 @@ self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
     let mimeType = file.type;
     let quality = 0.92; // default high quality
 
-    if (options.action === 'any-to-webp') {
-      mimeType = 'image/webp';
-      quality = (options.quality || 90) / 100;
-    } else if (options.action === 'webp-to-any') {
-      mimeType = options.format === 'png' ? 'image/png' : 'image/jpeg';
-      quality = (options.quality || 90) / 100;
+    if (options.action === 'convert') {
+      const format = options.format || 'webp';
+      mimeType = format === 'png' ? 'image/png' : format === 'jpeg' ? 'image/jpeg' : 'image/webp';
+      quality = format === 'png' ? 1 : (options.quality || 80) / 100;
     } else if (options.action === 'compress') {
       // Keep same format if possible, default to jpeg if not supported
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {

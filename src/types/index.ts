@@ -1,4 +1,6 @@
-export type ImageAction = 'webp-to-any' | 'any-to-webp' | 'compress' | 'resize' | 'crop' | 'rotate';
+export type ImageAction = 'convert' | 'compress' | 'resize' | 'crop' | 'rotate';
+
+export type OutputFormat = 'webp' | 'jpeg' | 'png';
 
 export interface CropArea {
   x: number; // percentage (0-100) or pixel
@@ -10,8 +12,9 @@ export interface CropArea {
 export interface ProcessingOptions {
   action: ImageAction;
   // Convert Options
-  format?: 'webp' | 'jpeg' | 'png';
+  format?: OutputFormat;
   quality?: number; // 1-100
+  applyDimensions?: boolean;
   // Compress Options
   compressionLevel?: 'low' | 'medium' | 'high' | 'custom';
   // Resize Options
@@ -53,12 +56,14 @@ export interface ImageItem {
 }
 
 export interface GlobalState {
+  activeMode: 'home' | 'convert' | 'edit';
   items: ImageItem[];
   theme: 'light' | 'dark';
   currentTab: ImageAction;
   isProcessingAll: boolean;
   // Actions
   setTheme: (theme: 'light' | 'dark') => void;
+  setActiveMode: (mode: 'home' | 'convert' | 'edit') => void;
   setCurrentTab: (tab: ImageAction) => void;
   addFiles: (files: File[], tab: ImageAction) => void;
   removeFile: (id: string) => void;

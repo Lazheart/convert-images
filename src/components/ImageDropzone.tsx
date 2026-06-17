@@ -4,8 +4,14 @@ import { useImageStore } from '../stores/imageStore';
 import { Upload, FileImage, ShieldCheck, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const SUPPORTED_FORMATS = {
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/png': ['.png'],
+  'image/webp': ['.webp'],
+};
+
 export const ImageDropzone: React.FC = () => {
-  const { currentTab, addFiles } = useImageStore();
+  const { currentTab, addFiles, activeMode } = useImageStore();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -14,23 +20,10 @@ export const ImageDropzone: React.FC = () => {
   }, [currentTab, addFiles]);
 
   const getAcceptConfig = () => {
-    switch (currentTab) {
-      case 'any-to-webp':
-        return {
-          'image/jpeg': ['.jpg', '.jpeg'],
-          'image/png': ['.png'],
-        };
-      case 'webp-to-any':
-        return {
-          'image/webp': ['.webp'],
-        };
-      default:
-        return {
-          'image/jpeg': ['.jpg', '.jpeg'],
-          'image/png': ['.png'],
-          'image/webp': ['.webp'],
-        };
+    if (activeMode === 'convert' || currentTab === 'convert') {
+      return SUPPORTED_FORMATS;
     }
+    return SUPPORTED_FORMATS;
   };
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
@@ -39,23 +32,16 @@ export const ImageDropzone: React.FC = () => {
   });
 
   const getInstructions = () => {
-    switch (currentTab) {
-      case 'any-to-webp':
-        return {
-          title: 'Arrastra tus imágenes JPG o PNG aquí',
-          subtitle: 'Soporta conversión masiva a formato WebP',
-        };
-      case 'webp-to-any':
-        return {
-          title: 'Arrastra tus imágenes WebP aquí',
-          subtitle: 'Convierte tus WebP a JPG o PNG en segundos',
-        };
-      default:
-        return {
-          title: 'Arrastra tus imágenes aquí',
-          subtitle: 'Soporta JPG, JPEG, PNG y WebP',
-        };
+    if (activeMode === 'convert') {
+      return {
+        title: 'Arrastra tus imágenes aquí',
+        subtitle: 'Soporta PNG, JPEG, WebP y JPG. Convierte todas a un formato o personaliza cada una',
+      };
     }
+    return {
+      title: 'Arrastra tus imágenes aquí',
+      subtitle: 'Soporta JPG, JPEG, PNG y WebP',
+    };
   };
 
   const instructions = getInstructions();
@@ -76,7 +62,6 @@ export const ImageDropzone: React.FC = () => {
           <input {...getInputProps()} />
           
           <div className="flex flex-col items-center justify-center">
-            {/* Animated upload icon container */}
             <motion.div 
               animate={isDragActive ? { y: -10 } : { y: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 15 }}
@@ -104,16 +89,14 @@ export const ImageDropzone: React.FC = () => {
             </button>
           </div>
 
-          {/* File Rejections Warning */}
           {fileRejections.length > 0 && (
             <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl text-red-600 dark:text-red-400 text-xs">
-              Algunos archivos no fueron aceptados. Asegúrate de subir formatos compatibles ({currentTab === 'webp-to-any' ? 'solo .webp' : 'solo .jpg, .jpeg, .png'}).
+              Algunos archivos no fueron aceptados. Asegúrate de subir formatos compatibles (.png, .jpg, .jpeg, .webp).
             </div>
           )}
         </motion.div>
       </div>
 
-      {/* Trust Badges */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12 max-w-3xl mx-auto">
         <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800/60">
           <ShieldCheck className="w-6 h-6 text-emerald-500 shrink-0" />

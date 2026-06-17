@@ -3,12 +3,12 @@ import { useImageStore } from '../stores/imageStore';
 import type { ImageAction } from '../types';
 import { motion } from 'framer-motion';
 import { 
-  FileImage, 
   Image as ImageIcon, 
-  Zap, 
   Maximize, 
   Crop, 
-  RotateCw 
+  RotateCw,
+  ChevronLeft,
+  Repeat
 } from 'lucide-react';
 
 interface TabItem {
@@ -16,56 +16,115 @@ interface TabItem {
   label: string;
   description: string;
   icon: React.ComponentType<any>;
+  mode: 'convert' | 'edit';
 }
 
-const tabs: TabItem[] = [
-  {
-    id: 'any-to-webp',
-    label: 'Convertir a WebP',
-    description: 'JPG/PNG a WebP de alta eficiencia',
-    icon: Zap,
-  },
-  {
-    id: 'webp-to-any',
-    label: 'Convertir desde WebP',
-    description: 'WebP a formatos estándar JPG/PNG',
-    icon: FileImage,
-  },
+const editTabs: TabItem[] = [
   {
     id: 'compress',
     label: 'Comprimir Imagen',
     description: 'Reduce tamaño sin perder calidad visual',
     icon: ImageIcon,
+    mode: 'edit',
   },
   {
     id: 'resize',
     label: 'Redimensionar',
     description: 'Cambia el ancho, alto o escala porcentual',
     icon: Maximize,
+    mode: 'edit',
   },
   {
     id: 'crop',
     label: 'Recortar Imagen',
     description: 'Recorta áreas específicas visualmente',
     icon: Crop,
+    mode: 'edit',
   },
   {
     id: 'rotate',
     label: 'Rotar y Voltear',
     description: 'Gira 90°/180°/270° o voltea la imagen',
     icon: RotateCw,
+    mode: 'edit',
   },
 ];
 
+const BackButton: React.FC<{ compact?: boolean }> = ({ compact }) => {
+  const { setActiveMode } = useImageStore();
+
+  return (
+    <button
+      onClick={() => setActiveMode('home')}
+      className={`flex items-center gap-1.5 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 cursor-pointer shrink-0 ${
+        compact ? 'px-3 py-2' : 'px-3 py-2 border border-transparent hover:border-slate-200 dark:hover:border-slate-800'
+      }`}
+      title="Volver al inicio"
+    >
+      <ChevronLeft className="w-4 h-4" />
+      <span className={compact ? 'hidden sm:inline' : ''}>Inicio</span>
+    </button>
+  );
+};
+
 export const TabNavigation: React.FC = () => {
-  const { currentTab, setCurrentTab, items } = useImageStore();
+  const { currentTab, setCurrentTab, items, activeMode } = useImageStore();
   const hasFiles = items.length > 0;
 
+  // Convert mode: unified page without sub-tabs
+// Convert mode: unified page without sub-tabs
+if (activeMode === 'convert') {
   if (hasFiles) {
-    // Render a compact tab navigation when files are present to give space to the queue
+    return (
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-2">
+        <div className="flex items-center gap-3 max-w-7xl mx-auto px-4">
+          <BackButton compact />
+
+          <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 shrink-0" />
+
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+            <Repeat className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            Convertir Imágenes
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Botón alineado al borde izquierdo */}
+      <div className="w-full px-6 lg:px-10 pt-6">
+        <BackButton />
+      </div>
+
+      {/* Encabezado centrado */}
+      <div className="max-w-6xl mx-auto px-4 pt-2 pb-4">
+        <div className="flex justify-center">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                Convierte tus Imágenes
+              </h1>
+
+              <p className="text-base text-slate-500 dark:text-slate-400 mt-1">
+                Convierte JPG, WebP y PNG en segundos
+              </p>
+            </div>
+        </div>
+      </div>
+    </>
+  );
+}
+  // Edit mode
+  const tabs = editTabs;
+
+  if (hasFiles) {
     return (
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-2 overflow-x-auto">
-        <div className="flex gap-2 max-w-7xl mx-auto px-4 min-w-max">
+        <div className="flex items-center gap-2 max-w-7xl mx-auto px-4 min-w-max">
+          <BackButton compact />
+          <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
+
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = currentTab === tab.id;
@@ -96,15 +155,18 @@ export const TabNavigation: React.FC = () => {
     );
   }
 
-  // Full beautiful hero selection tabs when no files uploaded
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="text-center max-w-3xl mx-auto mb-10">
-        <h1 className="text-4xl font-extrabold sm:text-5xl tracking-tight text-slate-900 dark:text-white leading-none">
-          Editor de Imágenes
+      <div className="mb-8">
+        <BackButton />
+      </div>
+
+      <div className="text-center mb-8">
+        <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">
+          Editar Imágenes
         </h1>
-        <p className="mt-4 text-lg text-slate-600 dark:text-slate-300">
-          Herramienta gratuita para procesar imágenes
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Selecciona la herramienta y luego sube tus imágenes
         </p>
       </div>
 
@@ -122,7 +184,6 @@ export const TabNavigation: React.FC = () => {
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-100/50 dark:hover:shadow-none'
               }`}
             >
-              {/* Highlight background element for active tab */}
               {isActive && (
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl -mr-8 -mt-8" />
               )}
@@ -141,7 +202,7 @@ export const TabNavigation: React.FC = () => {
                     ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                 }`}>
-                  {tab.id === 'webp-to-any' || tab.id === 'any-to-webp' ? 'Conversión' : 'Edición'}
+                  Edición
                 </div>
               </div>
 

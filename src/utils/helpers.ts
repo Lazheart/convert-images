@@ -18,8 +18,7 @@ export const downloadSingleFile = (item: ImageItem) => {
   const extension = item.result.format;
   
   let suffix = '';
-  if (item.options.action === 'any-to-webp') suffix = '-converted';
-  else if (item.options.action === 'webp-to-any') suffix = `-converted`;
+  if (item.options.action === 'convert') suffix = '-converted';
   else if (item.options.action === 'compress') suffix = '-compressed';
   else if (item.options.action === 'resize') suffix = `-resized-${item.result.width}x${item.result.height}`;
   else if (item.options.action === 'crop') suffix = '-cropped';
@@ -42,8 +41,7 @@ export const downloadAllAsZip = async (items: ImageItem[], actionName: string) =
     const extension = item.result.format;
     
     let suffix = '';
-    if (item.options.action === 'any-to-webp') suffix = '-converted';
-    else if (item.options.action === 'webp-to-any') suffix = '-converted';
+    if (item.options.action === 'convert') suffix = '-converted';
     else if (item.options.action === 'compress') suffix = '-compressed';
     else if (item.options.action === 'resize') suffix = `-resized-${item.result.width}x${item.result.height}`;
     else if (item.options.action === 'crop') suffix = '-cropped';
