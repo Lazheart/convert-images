@@ -1,75 +1,259 @@
-# React + TypeScript + Vite
+# ConvertImages
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**ConvertImages** es una aplicación web moderna para convertir y procesar imágenes directamente en el navegador. A diferencia de las plataformas tradicionales que requieren subir archivos a servidores externos, ConvertImages ejecuta todo el procesamiento localmente utilizando tecnologías nativas del navegador como **Web Workers** y **OffscreenCanvas**.
 
-Currently, two official plugins are available:
+Este enfoque elimina preocupaciones de privacidad, reduce tiempos de espera y permite procesar imágenes sin depender de infraestructura de servidor.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ¿Por qué ConvertImages?
 
-## React Compiler
+Los convertidores de imágenes tradicionales suelen depender de servicios remotos para procesar archivos. Esto implica:
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+* Transferencia de datos a servidores de terceros.
+* Riesgos de privacidad.
+* Costos operativos elevados.
+* Límites de uso, tamaño o cantidad de archivos.
 
-Note: This will impact Vite dev & build performances.
+ConvertImages adopta una filosofía diferente:
 
-## Expanding the ESLint configuration
+* Procesamiento 100% local.
+* Sin registros ni cuentas.
+* Sin anuncios.
+* Sin límites artificiales.
+* Código abierto y auditable.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Características
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Privacidad por Diseño
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Todas las imágenes permanecen en el dispositivo del usuario. Ningún archivo es enviado a servidores externos.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Procesamiento de Alto Rendimiento
+
+Las tareas pesadas se ejecutan mediante Web Workers, permitiendo que la interfaz permanezca fluida incluso durante conversiones por lotes.
+
+### Conversión Instantánea
+
+Conversión rápida entre formatos populares:
+
+* PNG
+* JPEG
+* WebP
+
+### Procesamiento por Lotes
+
+Convierte múltiples imágenes simultáneamente sin bloquear la interfaz.
+
+### Sin Dependencias de Backend
+
+La aplicación funciona completamente del lado del cliente, eliminando costos de infraestructura y simplificando el despliegue.
+
+### Código Abierto
+
+Toda la lógica de procesamiento es transparente y puede ser auditada, modificada y mejorada por la comunidad.
+
+---
+
+## Tecnologías
+
+| Categoría     | Tecnología      |
+| ------------- | --------------- |
+| Framework     | React 19        |
+| Lenguaje      | TypeScript      |
+| Estado Global | Zustand         |
+| Estilos       | Tailwind CSS 4  |
+| Animaciones   | Framer Motion   |
+| Bundler       | Vite            |
+| Procesamiento | Web Workers     |
+| Renderizado   | OffscreenCanvas |
+
+---
+
+## Modos de Trabajo
+
+### Convertir
+
+Diseñado para conversiones rápidas y procesamiento por lotes.
+
+Ejemplos:
+
+* PNG → WebP
+* JPEG → PNG
+* WebP → JPEG
+
+### Editar
+
+Herramientas enfocadas en modificaciones individuales:
+
+* Recorte
+* Redimensionamiento
+* Rotación
+* Ajustes adicionales
+
+### Inicio
+
+Pantalla principal desde la que el usuario selecciona el flujo de trabajo deseado.
+
+---
+
+## Instalación
+
+### Requisitos
+
+* Node.js 22+
+* pnpm 10+
+
+### Clonar el repositorio
+
+```bash
+git clone https://github.com/usuario/convert-images.git
+cd convert-images
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Instalar dependencias
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
 ```
+
+### Entorno de desarrollo
+
+```bash
+pnpm dev
+```
+
+### Generar build de producción
+
+```bash
+pnpm build
+```
+
+### Vista previa local
+
+```bash
+pnpm preview
+```
+
+---
+
+## Estructura del Proyecto
+
+```text
+convert-images/
+├── src/
+│   ├── components/
+│   │   ├── HomeSelector.tsx
+│   │   ├── ImageDropzone.tsx
+│   │   ├── QueueManager.tsx
+│   │   ├── TabNavigation.tsx
+│   │   └── SidebarSettings.tsx
+│   │
+│   ├── stores/
+│   │   └── imageStore.ts
+│   │
+│   ├── workers/
+│   │   └── image-processor.worker.ts
+│   │
+│   └── App.tsx
+│
+├── public/
+├── package.json
+├── vite.config.ts
+└── README.md
+```
+
+---
+
+## Arquitectura
+
+La aplicación utiliza una arquitectura basada en una tienda centralizada que coordina la interfaz y los procesos de fondo.
+
+```mermaid
+graph TD
+
+    UI[React UI]
+
+    Store[Zustand Store]
+
+    Worker[Image Processing Worker]
+
+    Canvas[OffscreenCanvas]
+
+    UI --> Store
+    Store --> Worker
+    Worker --> Canvas
+    Worker --> Store
+    Store --> UI
+```
+
+### Flujo de procesamiento
+
+1. El usuario selecciona una o varias imágenes.
+2. Los archivos se registran en la cola global.
+3. La tarea se envía al Web Worker.
+4. El Worker procesa la imagen usando OffscreenCanvas.
+5. El resultado vuelve al estado global.
+6. La interfaz actualiza el progreso y permite descargar los archivos generados.
+
+---
+
+## Filosofía del Proyecto
+
+ConvertImages se construye bajo cuatro principios fundamentales:
+
+### Privacidad
+
+Los datos pertenecen al usuario.
+
+### Rendimiento
+
+El hardware del cliente debe aprovecharse al máximo.
+
+### Simplicidad
+
+La experiencia debe ser rápida e intuitiva.
+
+### Accesibilidad
+
+Las funciones principales deben estar disponibles sin barreras ni suscripciones.
+
+---
+
+## Hoja de Ruta
+
+Funciones previstas para futuras versiones:
+
+* Soporte AVIF
+* Soporte JPEG XL
+* Compresión avanzada
+* Eliminación de metadatos EXIF
+* Optimización inteligente de tamaño
+* Procesamiento masivo de carpetas
+* Progressive Web App (PWA)
+* Arrastrar y soltar desde carpetas
+* Comparación antes/después
+* Historial local de conversiones
+
+---
+
+## Contribuciones
+
+Las contribuciones son bienvenidas.
+
+```bash
+# Crear una rama
+git checkout -b feature/nueva-funcionalidad
+
+# Realizar cambios
+git commit -m "Añadir nueva funcionalidad"
+
+# Publicar rama
+git push origin feature/nueva-funcionalidad
+```
+
+Posteriormente abre un Pull Request describiendo los cambios realizados.
+
+---
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia especificada en el repositorio.
