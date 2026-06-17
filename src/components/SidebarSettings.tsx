@@ -1,6 +1,7 @@
 import React from 'react';
 import { useImageStore } from '../stores/imageStore';
 import { downloadAllAsZip } from '../utils/helpers';
+import type { OutputFormat } from '../types';
 import { 
   Settings, 
   Play, 
@@ -42,8 +43,17 @@ export const SidebarSettings: React.FC = () => {
     updateAllFileOptions({ quality: val });
   };
 
-  const handleFormatChange = (format: 'jpeg' | 'png') => {
+  const handleFormatChange = (format: OutputFormat) => {
     updateAllFileOptions({ format });
+  };
+
+  const handleApplyDimensions = (applyDimensions: boolean) => {
+    const updates: Partial<typeof options> = { applyDimensions };
+    if (applyDimensions && firstItem) {
+      updates.width = firstItem.originalWidth || options.width;
+      updates.height = firstItem.originalHeight || options.height;
+    }
+    updateAllFileOptions(updates);
   };
 
   const handleCompressionLevel = (level: 'low' | 'medium' | 'high' | 'custom') => {
@@ -106,13 +116,7 @@ export const SidebarSettings: React.FC = () => {
         onChange={handleFileInputChange} 
         multiple 
         className="hidden" 
-        accept={
-          currentTab === 'any-to-webp' 
-            ? 'image/jpeg,image/png' 
-            : currentTab === 'webp-to-any' 
-              ? 'image/webp' 
-              : 'image/jpeg,image/png,image/webp'
-        }
+        accept="image/jpeg,image/png,image/webp"
       />
 
       {/* Main Configurations */}
@@ -122,69 +126,42 @@ export const SidebarSettings: React.FC = () => {
           <h3 className="font-bold text-slate-900 dark:text-white">Ajustes Generales</h3>
         </div>
 
-        {/* 1. Convert to WebP settings */}
-        {currentTab === 'any-to-webp' && (
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Calidad WebP
-                </label>
-                <span className="text-xs font-bold text-purple-600 dark:text-purple-400 font-mono">
-                  {options.quality || 80}%
-                </span>
-              </div>
-              <input 
-                type="range" 
-                min="1" 
-                max="100" 
-                value={options.quality || 80}
-                onChange={(e) => handleQualityChange(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-600"
-              />
-              <p className="text-[10px] text-slate-400 mt-1">
-                Valores bajos reducen más el archivo pero reducen la nitidez.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* 2. Convert from WebP settings */}
-        {currentTab === 'webp-to-any' && (
+        {/* Convert settings */}
+        {currentTab === 'convert' && (
           <div className="space-y-4">
             <div>
               <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
-                Formato de salida
+                Formato de salida (todas)
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => handleFormatChange('jpeg')}
-                  className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
-                    options.format === 'jpeg'
-                      ? 'border-purple-600 bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-500'
-                      : 'border-slate-200 dark:border-slate-850 hover:bg-slate-55'
-                  }`}
-                >
-                  JPG / JPEG
-                </button>
-                <button
-                  onClick={() => handleFormatChange('png')}
-                  className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
-                    options.format === 'png'
-                      ? 'border-purple-600 bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-500'
-                      : 'border-slate-200 dark:border-slate-850 hover:bg-slate-55'
-                  }`}
-                >
-                  PNG (Sin Pérdida)
-                </button>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { id: 'webp' as const, label: 'WebP' },
+                  { id: 'jpeg' as const, label: 'JPG / JPEG' },
+                  { id: 'png' as const, label: 'PNG' },
+                ]).map(({ id, label }) => (
+                  <button
+                    key={id}
+                    onClick={() => handleFormatChange(id)}
+                    className={`py-2 px-2 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                      options.format === id
+                        ? 'border-purple-600 bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-500'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
+              <p className="text-[10px] text-slate-400 mt-1.5">
+                Se aplica a todas las imágenes. Puedes cambiar el formato de cada una en la lista.
+              </p>
             </div>
 
             {options.format !== 'png' && (
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Calidad JPG
+                    Calidad
                   </label>
                   <span className="text-xs font-bold text-purple-600 dark:text-purple-400 font-mono">
                     {options.quality || 80}%
@@ -200,10 +177,69 @@ export const SidebarSettings: React.FC = () => {
                 />
               </div>
             )}
+
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options.applyDimensions ?? false}
+                  onChange={(e) => handleApplyDimensions(e.target.checked)}
+                  className="w-4 h-4 rounded text-purple-600 border-slate-300 focus:ring-purple-500"
+                />
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 select-none">
+                  Aplicar dimensiones específicas
+                </span>
+              </label>
+
+              {options.applyDimensions && (
+                <div className="space-y-3 mt-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+                        Ancho (px)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Ancho"
+                        value={options.width || ''}
+                        onChange={(e) => handleWidthChange(parseInt(e.target.value) || 0)}
+                        className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+                        Alto (px)
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Alto"
+                        value={options.height || ''}
+                        onChange={(e) => handleHeightChange(parseInt(e.target.value) || 0)}
+                        className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={options.maintainAspectRatio ?? true}
+                      onChange={(e) => handleAspectChange(e.target.checked)}
+                      className="w-4 h-4 rounded text-purple-600 border-slate-300 focus:ring-purple-500"
+                    />
+                    <span className="text-xs text-slate-600 dark:text-slate-400 select-none">
+                      Mantener proporción original
+                    </span>
+                  </label>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* 3. Compression settings */}
+        {/* Compression settings */}
         {currentTab === 'compress' && (
           <div className="space-y-4">
             <div>

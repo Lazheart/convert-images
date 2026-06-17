@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ImageItem } from '../types';
+import type { ImageItem, OutputFormat } from '../types';
 import { useImageStore } from '../stores/imageStore';
 import { formatSize, downloadSingleFile } from '../utils/helpers';
 import { CropSelector } from './CropSelector';
@@ -33,13 +33,23 @@ export const ImageItemCard: React.FC<ImageItemCardProps> = ({ item }) => {
     updateFileOptions(item.id, { cropArea: area });
   };
 
+  const formatLabels: Record<OutputFormat, string> = {
+    webp: 'WebP',
+    jpeg: 'JPG',
+    png: 'PNG',
+  };
+
   const getOptionsDescription = () => {
     const { options } = item;
     switch (currentTab) {
-      case 'any-to-webp':
-        return `A WebP (Calidad ${options.quality}%)`;
-      case 'webp-to-any':
-        return `A ${options.format?.toUpperCase()} (Calidad ${options.quality || 80}%)`;
+      case 'convert': {
+        const fmt = formatLabels[options.format || 'webp'];
+        const quality = options.format === 'png' ? '' : ` (Calidad ${options.quality || 80}%)`;
+        const dims = options.applyDimensions
+          ? ` • ${options.width || 'Auto'}x${options.height || 'Auto'}px`
+          : '';
+        return `A ${fmt}${quality}${dims}`;
+      }
       case 'compress':
         return `Compresión: ${
           options.compressionLevel === 'low' ? 'Baja' :
@@ -120,6 +130,26 @@ export const ImageItemCard: React.FC<ImageItemCardProps> = ({ item }) => {
                 {getOptionsDescription()}
               </span>
             </div>
+
+            {/* Per-image format selector for convert */}
+            {currentTab === 'convert' && item.status === 'idle' && (
+              <div className="flex items-center gap-1.5 mt-2">
+                <span className="text-[10px] text-slate-400 shrink-0">Formato:</span>
+                {(['webp', 'jpeg', 'png'] as const).map((fmt) => (
+                  <button
+                    key={fmt}
+                    onClick={() => updateFileOptions(item.id, { format: fmt })}
+                    className={`px-2 py-0.5 text-[10px] font-bold rounded-md border transition-all cursor-pointer ${
+                      (item.options.format || 'webp') === fmt
+                        ? 'border-purple-600 bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {formatLabels[fmt]}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Custom parameters override in-line for Resize */}
             {currentTab === 'resize' && item.options.resizeType === 'pixels' && item.status === 'idle' && (

@@ -24,10 +24,8 @@ const getImageDimensions = (file: File): Promise<{ width: number; height: number
 
 const getDefaultOptions = (action: ImageAction): ProcessingOptions => {
   switch (action) {
-    case 'any-to-webp':
-      return { action, quality: 80 };
-    case 'webp-to-any':
-      return { action, format: 'jpeg', quality: 80 };
+    case 'convert':
+      return { action, format: 'webp', quality: 80, applyDimensions: false, maintainAspectRatio: true };
     case 'compress':
       return { action, compressionLevel: 'medium', quality: 75 };
     case 'resize':
@@ -64,7 +62,7 @@ export const useImageStore = create<GlobalState>((set, get) => {
     activeMode: 'home',
     items: [],
     theme: initialTheme,
-    currentTab: 'any-to-webp',
+    currentTab: 'convert',
     isProcessingAll: false,
 
     setTheme: (theme) => {
@@ -80,7 +78,7 @@ export const useImageStore = create<GlobalState>((set, get) => {
     setActiveMode: (activeMode) => {
       let currentTab = get().currentTab;
       if (activeMode === 'convert') {
-        currentTab = 'any-to-webp';
+        currentTab = 'convert';
       } else if (activeMode === 'edit') {
         currentTab = 'compress';
       }
@@ -118,8 +116,7 @@ export const useImageStore = create<GlobalState>((set, get) => {
         const dimensions = await getImageDimensions(file);
         
         const defaultOpts = getDefaultOptions(tab);
-        // If resize, initialize custom dimensions based on image
-        if (tab === 'resize') {
+        if (tab === 'resize' || (tab === 'convert' && defaultOpts.applyDimensions)) {
           defaultOpts.width = dimensions.width;
           defaultOpts.height = dimensions.height;
         }

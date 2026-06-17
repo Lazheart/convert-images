@@ -3,13 +3,12 @@ import { useImageStore } from '../stores/imageStore';
 import type { ImageAction } from '../types';
 import { motion } from 'framer-motion';
 import { 
-  FileImage, 
   Image as ImageIcon, 
-  Zap, 
   Maximize, 
   Crop, 
   RotateCw,
-  ChevronLeft
+  ChevronLeft,
+  Repeat
 } from 'lucide-react';
 
 interface TabItem {
@@ -20,21 +19,7 @@ interface TabItem {
   mode: 'convert' | 'edit';
 }
 
-const allTabs: TabItem[] = [
-  {
-    id: 'any-to-webp',
-    label: 'Convertir a WebP',
-    description: 'JPG/PNG a WebP de alta eficiencia',
-    icon: Zap,
-    mode: 'convert',
-  },
-  {
-    id: 'webp-to-any',
-    label: 'Convertir desde WebP',
-    description: 'WebP a formatos estándar JPG/PNG',
-    icon: FileImage,
-    mode: 'convert',
-  },
+const editTabs: TabItem[] = [
   {
     id: 'compress',
     label: 'Comprimir Imagen',
@@ -65,30 +50,83 @@ const allTabs: TabItem[] = [
   },
 ];
 
+const BackButton: React.FC<{ compact?: boolean }> = ({ compact }) => {
+  const { setActiveMode } = useImageStore();
+
+  return (
+    <button
+      onClick={() => setActiveMode('home')}
+      className={`flex items-center gap-1.5 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 cursor-pointer shrink-0 ${
+        compact ? 'px-3 py-2' : 'px-3 py-2 border border-transparent hover:border-slate-200 dark:hover:border-slate-800'
+      }`}
+      title="Volver al inicio"
+    >
+      <ChevronLeft className="w-4 h-4" />
+      <span className={compact ? 'hidden sm:inline' : ''}>Inicio</span>
+    </button>
+  );
+};
+
 export const TabNavigation: React.FC = () => {
-  const { currentTab, setCurrentTab, items, activeMode, setActiveMode } = useImageStore();
+  const { currentTab, setCurrentTab, items, activeMode } = useImageStore();
   const hasFiles = items.length > 0;
 
-  // Filter tabs according to the active mode
-  const tabs = allTabs.filter((t) => t.mode === activeMode);
+  // Convert mode: unified page without sub-tabs
+  if (activeMode === 'convert') {
+    if (hasFiles) {
+      return (
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-2">
+          <div className="flex items-center gap-3 max-w-7xl mx-auto px-4">
+            <BackButton compact />
+            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 shrink-0" />
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+              <Repeat className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              Convertir Imágenes
+            </div>
+          </div>
+        </div>
+      );
+    }
 
-  const modeLabel = activeMode === 'convert' ? 'Convertir' : 'Editar';
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+        <div className="mb-8">
+          <BackButton />
+        </div>
+
+        <div className="text-center mb-2">
+          <div className="inline-flex items-center justify-center p-3 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/30 mb-4">
+            <Repeat className="w-6 h-6" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+            Convertir Imágenes
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-lg mx-auto">
+            Sube tus imágenes y conviértelas a PNG, JPEG, WebP o JPG. Aplica el mismo formato a todas o personaliza cada una.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+            {['PNG', 'JPEG', 'WebP', 'JPG'].map((fmt) => (
+              <span
+                key={fmt}
+                className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+              >
+                {fmt}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Edit mode
+  const tabs = editTabs;
 
   if (hasFiles) {
-    // Compact horizontal tab bar when files are loaded
     return (
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-2 overflow-x-auto">
         <div className="flex items-center gap-2 max-w-7xl mx-auto px-4 min-w-max">
-          {/* Back button */}
-          <button
-            onClick={() => setActiveMode('home')}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 cursor-pointer shrink-0"
-            title="Volver al inicio"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Inicio</span>
-          </button>
-
+          <BackButton compact />
           <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
 
           {tabs.map((tab) => {
@@ -121,34 +159,22 @@ export const TabNavigation: React.FC = () => {
     );
   }
 
-  // Full card-style tab selection when no files are uploaded
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* Header with back button + title */}
-      <div className="flex items-center gap-3 mb-8">
-        <button
-          onClick={() => setActiveMode('home')}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all duration-200 cursor-pointer"
-          title="Volver al inicio"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Inicio
-        </button>
-
-        <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
-
-        <div>
-          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">
-            {modeLabel} Imágenes
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Selecciona la herramienta y luego sube tus imágenes
-          </p>
-        </div>
+      <div className="mb-8">
+        <BackButton />
       </div>
 
-      {/* Tab cards grid */}
-      <div className={`grid grid-cols-1 gap-6 ${tabs.length === 2 ? 'md:grid-cols-2 max-w-2xl' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
+      <div className="text-center mb-8">
+        <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">
+          Editar Imágenes
+        </h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Selecciona la herramienta y luego sube tus imágenes
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentTab === tab.id;
@@ -162,7 +188,6 @@ export const TabNavigation: React.FC = () => {
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-100/50 dark:hover:shadow-none'
               }`}
             >
-              {/* Active glow */}
               {isActive && (
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl -mr-8 -mt-8" />
               )}
@@ -181,7 +206,7 @@ export const TabNavigation: React.FC = () => {
                     ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                 }`}>
-                  {tab.mode === 'convert' ? 'Conversión' : 'Edición'}
+                  Edición
                 </div>
               </div>
 
