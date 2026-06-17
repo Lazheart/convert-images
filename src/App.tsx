@@ -41,9 +41,12 @@ export const App: React.FC = () => {
       {/* Footer */}
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400 mt-auto transition-colors duration-200">
         <div className="flex items-center justify-center gap-2">
-          <span>Código abierto con Licencia MIT</span>
+          <span>Código abierto con Licencia Apache 2.0</span>
           <span className="text-slate-300 dark:text-slate-700">|</span>
-          <span>Desarrollado por Lazheart</span>
+          <span>Desarrollado por </span>
+          <a href="https://github.com/lazheart" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300">
+            Lazheart
+          </a>
         </div>
       </footer>
     </div>
