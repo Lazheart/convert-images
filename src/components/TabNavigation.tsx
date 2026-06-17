@@ -90,30 +90,15 @@ export const TabNavigation: React.FC = () => {
 
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-        <div className="mb-8">
-          <BackButton />
-        </div>
+        <BackButton />
 
-        <div className="text-center mb-2">
+        <div className="text-center mt-6 mb-2">
           <div className="inline-flex items-center justify-center p-3 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/30 mb-4">
             <Repeat className="w-6 h-6" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             Convertir Imágenes
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-lg mx-auto">
-            Sube tus imágenes y conviértelas a PNG, JPEG, WebP o JPG. Aplica el mismo formato a todas o personaliza cada una.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
-            {['PNG', 'JPEG', 'WebP', 'JPG'].map((fmt) => (
-              <span
-                key={fmt}
-                className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-              >
-                {fmt}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     );
