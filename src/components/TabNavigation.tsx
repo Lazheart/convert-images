@@ -101,13 +101,10 @@ export const TabNavigation: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="text-center max-w-3xl mx-auto mb-10">
         <h1 className="text-4xl font-extrabold sm:text-5xl tracking-tight text-slate-900 dark:text-white leading-none">
-          Herramientas de Imagen{' '}
-          <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-500 bg-clip-text text-transparent">
-            100% Client-Side
-          </span>
+          Editor de Imágenes
         </h1>
         <p className="mt-4 text-lg text-slate-600 dark:text-slate-300">
-          Procesa tus imágenes masivamente de forma instantánea. Tus archivos nunca salen de tu ordenador.
+          Herramienta gratuita para procesar imágenes
         </p>
       </div>
 

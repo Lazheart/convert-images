@@ -35,7 +35,7 @@ export const QueueManager: React.FC = () => {
         <div className="mt-4 p-3 bg-blue-50/50 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-900/20 rounded-2xl flex gap-2.5 items-start">
           <AlertCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
           <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-            <strong>Procesamiento en segundo plano:</strong> La conversión utiliza <em>Web Workers</em> y <em>OffscreenCanvas</em> para no ralentizar tu navegador. Todo ocurre en tu ordenador, manteniendo tus imágenes 100% privadas.
+            <strong>Procesamiento en segundo plano:</strong> La conversión utiliza <em>Web Workers</em> y <em>OffscreenCanvas</em> para no ralentizar tu navegador.
           </p>
         </div>
       </div>

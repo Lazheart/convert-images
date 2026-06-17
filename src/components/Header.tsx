@@ -17,14 +17,11 @@ export const Header: React.FC = () => {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-500 bg-clip-text text-transparent">
-                ConvertImage
-              </span>
-              <span className="px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-purple-700 bg-purple-100 dark:text-purple-300 dark:bg-purple-900/50 rounded-md">
-                100% LOCAL
+                ConvertImages
               </span>
             </div>
             <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-              Procesamiento seguro en tu navegador
+             Procesador y Conversor de Imágenes 
             </p>
           </div>
         </div>
@@ -33,7 +30,7 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-3">
           {/* GitHub Project */}
           <a
-            href="https://github.com"
+            href="https://github.com/lazheart/convert-images"
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-all"
