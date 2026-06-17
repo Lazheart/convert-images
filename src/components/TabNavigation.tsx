@@ -72,38 +72,49 @@ export const TabNavigation: React.FC = () => {
   const hasFiles = items.length > 0;
 
   // Convert mode: unified page without sub-tabs
-  if (activeMode === 'convert') {
-    if (hasFiles) {
-      return (
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-2">
-          <div className="flex items-center gap-3 max-w-7xl mx-auto px-4">
-            <BackButton compact />
-            <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 shrink-0" />
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
-              <Repeat className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              Convertir Imágenes
-            </div>
-          </div>
-        </div>
-      );
-    }
-
+// Convert mode: unified page without sub-tabs
+if (activeMode === 'convert') {
+  if (hasFiles) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-        <BackButton />
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-2">
+        <div className="flex items-center gap-3 max-w-7xl mx-auto px-4">
+          <BackButton compact />
 
-        <div className="text-center mt-6 mb-2">
-          <div className="inline-flex items-center justify-center p-3 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/30 mb-4">
-            <Repeat className="w-6 h-6" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+          <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 shrink-0" />
+
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+            <Repeat className="w-4 h-4 text-purple-600 dark:text-purple-400" />
             Convertir Imágenes
-          </h1>
+          </div>
         </div>
       </div>
     );
   }
 
+  return (
+    <>
+      {/* Botón alineado al borde izquierdo */}
+      <div className="w-full px-6 lg:px-10 pt-6">
+        <BackButton />
+      </div>
+
+      {/* Encabezado centrado */}
+      <div className="max-w-6xl mx-auto px-4 pt-2 pb-4">
+        <div className="flex justify-center">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                Convierte tus Imágenes
+              </h1>
+
+              <p className="text-base text-slate-500 dark:text-slate-400 mt-1">
+                Convierte JPG, WebP y PNG en segundos
+              </p>
+            </div>
+        </div>
+      </div>
+    </>
+  );
+}
   // Edit mode
   const tabs = editTabs;
 
