@@ -61,6 +61,7 @@ export const useImageStore = create<GlobalState>((set, get) => {
   const activeWorkers: Record<string, Worker> = {};
 
   return {
+    activeMode: 'home',
     items: [],
     theme: initialTheme,
     currentTab: 'any-to-webp',
@@ -74,6 +75,19 @@ export const useImageStore = create<GlobalState>((set, get) => {
         document.documentElement.classList.remove('dark');
       }
       set({ theme });
+    },
+
+    setActiveMode: (activeMode) => {
+      let currentTab = get().currentTab;
+      if (activeMode === 'convert') {
+        currentTab = 'any-to-webp';
+      } else if (activeMode === 'edit') {
+        currentTab = 'compress';
+      }
+
+      // Clear all files to avoid bleeding files/state between modes
+      get().clearFiles();
+      set({ activeMode, currentTab });
     },
 
     setCurrentTab: (currentTab) => {

@@ -3,10 +3,11 @@ import { Header } from './components/Header';
 import { TabNavigation } from './components/TabNavigation';
 import { ImageDropzone } from './components/ImageDropzone';
 import { QueueManager } from './components/QueueManager';
+import { HomeSelector } from './components/HomeSelector';
 import { useImageStore } from './stores/imageStore';
 
 export const App: React.FC = () => {
-  const { items } = useImageStore();
+  const { items, activeMode } = useImageStore();
   const hasFiles = items.length > 0;
 
   return (
@@ -17,16 +18,23 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-grow flex flex-col">
-        {/* Tab Selection */}
-        <TabNavigation />
-
-        {/* Dropzone or Queue Manager */}
-        {hasFiles ? (
-          <QueueManager />
+        {activeMode === 'home' ? (
+          // Home: show the two main action cards
+          <HomeSelector />
         ) : (
-          <div className="flex-grow flex items-center justify-center py-6">
-            <ImageDropzone />
-          </div>
+          <>
+            {/* Tab Selection (Convert or Edit mode) */}
+            <TabNavigation />
+
+            {/* Dropzone or Queue Manager */}
+            {hasFiles ? (
+              <QueueManager />
+            ) : (
+              <div className="flex-grow flex items-center justify-center py-6">
+                <ImageDropzone />
+              </div>
+            )}
+          </>
         )}
       </main>
 
@@ -36,7 +44,7 @@ export const App: React.FC = () => {
           <span>Código abierto con Licencia MIT</span>
           <span className="text-slate-300 dark:text-slate-700">|</span>
           <span>Desarrollado por Lazheart</span>
-          </div>
+        </div>
       </footer>
     </div>
   );

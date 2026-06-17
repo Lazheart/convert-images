@@ -8,7 +8,8 @@ import {
   Zap, 
   Maximize, 
   Crop, 
-  RotateCw 
+  RotateCw,
+  ChevronLeft
 } from 'lucide-react';
 
 interface TabItem {
@@ -16,56 +17,80 @@ interface TabItem {
   label: string;
   description: string;
   icon: React.ComponentType<any>;
+  mode: 'convert' | 'edit';
 }
 
-const tabs: TabItem[] = [
+const allTabs: TabItem[] = [
   {
     id: 'any-to-webp',
     label: 'Convertir a WebP',
     description: 'JPG/PNG a WebP de alta eficiencia',
     icon: Zap,
+    mode: 'convert',
   },
   {
     id: 'webp-to-any',
     label: 'Convertir desde WebP',
     description: 'WebP a formatos estándar JPG/PNG',
     icon: FileImage,
+    mode: 'convert',
   },
   {
     id: 'compress',
     label: 'Comprimir Imagen',
     description: 'Reduce tamaño sin perder calidad visual',
     icon: ImageIcon,
+    mode: 'edit',
   },
   {
     id: 'resize',
     label: 'Redimensionar',
     description: 'Cambia el ancho, alto o escala porcentual',
     icon: Maximize,
+    mode: 'edit',
   },
   {
     id: 'crop',
     label: 'Recortar Imagen',
     description: 'Recorta áreas específicas visualmente',
     icon: Crop,
+    mode: 'edit',
   },
   {
     id: 'rotate',
     label: 'Rotar y Voltear',
     description: 'Gira 90°/180°/270° o voltea la imagen',
     icon: RotateCw,
+    mode: 'edit',
   },
 ];
 
 export const TabNavigation: React.FC = () => {
-  const { currentTab, setCurrentTab, items } = useImageStore();
+  const { currentTab, setCurrentTab, items, activeMode, setActiveMode } = useImageStore();
   const hasFiles = items.length > 0;
 
+  // Filter tabs according to the active mode
+  const tabs = allTabs.filter((t) => t.mode === activeMode);
+
+  const modeLabel = activeMode === 'convert' ? 'Convertir' : 'Editar';
+
   if (hasFiles) {
-    // Render a compact tab navigation when files are present to give space to the queue
+    // Compact horizontal tab bar when files are loaded
     return (
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-2 overflow-x-auto">
-        <div className="flex gap-2 max-w-7xl mx-auto px-4 min-w-max">
+        <div className="flex items-center gap-2 max-w-7xl mx-auto px-4 min-w-max">
+          {/* Back button */}
+          <button
+            onClick={() => setActiveMode('home')}
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 cursor-pointer shrink-0"
+            title="Volver al inicio"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Inicio</span>
+          </button>
+
+          <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
+
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = currentTab === tab.id;
@@ -96,19 +121,34 @@ export const TabNavigation: React.FC = () => {
     );
   }
 
-  // Full beautiful hero selection tabs when no files uploaded
+  // Full card-style tab selection when no files are uploaded
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="text-center max-w-3xl mx-auto mb-10">
-        <h1 className="text-4xl font-extrabold sm:text-5xl tracking-tight text-slate-900 dark:text-white leading-none">
-          Editor de Imágenes
-        </h1>
-        <p className="mt-4 text-lg text-slate-600 dark:text-slate-300">
-          Herramienta gratuita para procesar imágenes
-        </p>
+      {/* Header with back button + title */}
+      <div className="flex items-center gap-3 mb-8">
+        <button
+          onClick={() => setActiveMode('home')}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-900 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all duration-200 cursor-pointer"
+          title="Volver al inicio"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Inicio
+        </button>
+
+        <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
+
+        <div>
+          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">
+            {modeLabel} Imágenes
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Selecciona la herramienta y luego sube tus imágenes
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Tab cards grid */}
+      <div className={`grid grid-cols-1 gap-6 ${tabs.length === 2 ? 'md:grid-cols-2 max-w-2xl' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentTab === tab.id;
@@ -122,7 +162,7 @@ export const TabNavigation: React.FC = () => {
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg hover:shadow-slate-100/50 dark:hover:shadow-none'
               }`}
             >
-              {/* Highlight background element for active tab */}
+              {/* Active glow */}
               {isActive && (
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl -mr-8 -mt-8" />
               )}
@@ -141,7 +181,7 @@ export const TabNavigation: React.FC = () => {
                     ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                 }`}>
-                  {tab.id === 'webp-to-any' || tab.id === 'any-to-webp' ? 'Conversión' : 'Edición'}
+                  {tab.mode === 'convert' ? 'Conversión' : 'Edición'}
                 </div>
               </div>
 

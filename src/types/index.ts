@@ -53,12 +53,14 @@ export interface ImageItem {
 }
 
 export interface GlobalState {
+  activeMode: 'home' | 'convert' | 'edit';
   items: ImageItem[];
   theme: 'light' | 'dark';
   currentTab: ImageAction;
   isProcessingAll: boolean;
   // Actions
   setTheme: (theme: 'light' | 'dark') => void;
+  setActiveMode: (mode: 'home' | 'convert' | 'edit') => void;
   setCurrentTab: (tab: ImageAction) => void;
   addFiles: (files: File[], tab: ImageAction) => void;
   removeFile: (id: string) => void;
